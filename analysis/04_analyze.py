@@ -22,46 +22,42 @@ ax[0].axhline(.5, c='k', ls=':', lw=.8); ax[0].set_ylabel('FD (mm)'); ax[0].set_
 ax[1].bar([f'run {r}' for r in R], [res[f'run{r}']['mean_FD'] for r in R]); ax[1].set_ylabel('mean FD (mm)')
 plt.tight_layout(); plt.savefig(F + 'motion.png', dpi=110); plt.close()
 
-# ---------- tSNR ----------
-tsnr_imgs = []
+# ---------- tSNR + masking (work in 2D arrays to save memory) ----------
+from scipy.ndimage import gaussian_filter
+brain_mask = image.math_img('a * b', a=image.math_img('img > 0', img=nib.load(d + 'run2_mni.nii.gz').slicer[..., 0]), b=gm_mask)
+bm = NiftiMasker(mask_img=brain_mask).fit()
+wm_mask = image.math_img('img > 0.9', img=image.resample_to_img(datasets.load_mni152_wm_mask(), mni, interpolation='nearest'))
+M = brain_mask.get_fdata() > 0; W = wm_mask.get_fdata() > 0
+sig = 6 / 2.3548 / 2  # 6mm FWHM in 2mm voxels
+clean = {}; keep = {}; tsnr_maps = []
 for r in R:
-    img = nib.load(d + f'run{r}_mni.nii.gz'); x = img.get_fdata(dtype=np.float32)[..., 5:]
-    hp = x - np.mean(x, -1, keepdims=True)
-    t = np.where(x.mean(-1) > 0, x.mean(-1) / (x.std(-1) + 1e-6), 0)
-    tsnr_imgs.append(nib.Nifti1Image(t.astype(np.float32), img.affine))
-    res[f'run{r}']['median_tSNR_gm'] = round(float(np.median(masking.apply_mask(tsnr_imgs[-1], gm_mask))), 1)
-brain_mask = image.math_img('img > 0', img=image.mean_img(tsnr_imgs))
-brain_mask = image.math_img('a * b', a=brain_mask, b=gm_mask)
-plotting.plot_img(image.mean_img(tsnr_imgs), cmap='inferno', colorbar=True, display_mode='z', cut_coords=8,
-                  title='temporal SNR (mean over runs)', vmin=0, vmax=80).savefig(F + 'tsnr.png', dpi=110)
-
-# ---------- denoising confounds ----------
-csf = image.math_img('img > 0.9', img=image.resample_to_img(datasets.load_mni152_wm_mask(), mni, interpolation='nearest'))
-def confounds(r, img):
+    img = nib.load(d + f'run{r}_mni.nii.gz'); T = img.shape[-1]
+    X = np.empty((T - 5, M.sum()), np.float32); Wd = np.empty((T - 5, W.sum()), np.float32)
+    for t in range(5, T):
+        v = np.asarray(img.dataobj[..., t], dtype=np.float32)
+        Wd[t - 5] = v[W]; X[t - 5] = gaussian_filter(v, sig)[M]
+    raw = np.empty((T - 5, M.sum()), np.float32)
+    for t in range(5, T): raw[t - 5] = np.asarray(img.dataobj[..., t], dtype=np.float32)[M]
+    tsnr = raw.mean(0) / (raw.std(0) + 1e-6); del raw
+    tsnr_maps.append(tsnr); res[f'run{r}']['median_tSNR_gm'] = round(float(np.median(tsnr)), 1)
     p = np.loadtxt(d + f'run{r}_motion.txt'); dp = np.vstack([np.zeros(6), np.diff(p, axis=0)])
-    mot = np.hstack([p, dp, p ** 2, dp ** 2])
-    wm = masking.apply_mask(img, csf)
-    wm = signal.clean(wm, detrend=True, standardize='zscore_sample')
-    u, s, vt = np.linalg.svd(wm, full_matrices=False)
-    return np.hstack([mot, u[:, :5]])  # 24 motion + 5 aCompCor (white matter)
-clean = {}
-for r in R:
-    img = nib.load(d + f'run{r}_mni.nii.gz')
-    img = image.index_img(img, slice(5, None))
-    conf = confounds(r, img)
-    keep = fd[r][5:] <= 0.5
-    clean[r] = image.clean_img(img, confounds=conf, detrend=True, standardize='zscore_sample', high_pass=0.008, t_r=TR, mask_img=brain_mask)
-    clean[r] = image.smooth_img(clean[r], 6)
-    res[f'run{r}']['vols_kept_after_scrub'] = int(keep.sum())
-    clean[r]._keep = keep
-
+    mot = np.hstack([p, dp, p ** 2, dp ** 2])[5:]
+    wz = signal.clean(Wd, detrend=True, standardize='zscore_sample'); u = np.linalg.svd(wz, full_matrices=False)[0][:, :5]
+    clean[r] = signal.clean(X, confounds=np.hstack([mot, u]), detrend=True, standardize='zscore_sample', high_pass=0.008, t_r=TR).astype(np.float32)
+    keep[r] = fd[r][5:] <= 0.5; res[f'run{r}']['vols_kept_after_scrub'] = int(keep[r].sum())
+    del X, Wd; print('cleaned run', r, flush=True)
+plotting.plot_img(bm.inverse_transform(np.mean(tsnr_maps, 0)), cmap='inferno', colorbar=True, display_mode='z', cut_coords=8,
+                  title='temporal SNR (mean over runs)', vmin=0, vmax=80, black_bg=True).savefig(F + 'tsnr.png', dpi=110)
 # ---------- atlas connectivity ----------
 sch = datasets.fetch_atlas_schaefer_2018(n_rois=100, yeo_networks=7, resolution_mm=2)
 labels = [l.decode() if isinstance(l, bytes) else l for l in sch.labels]
 labels = [l for l in labels if l != 'Background']
 net = [l.split('_')[2] for l in labels]
-masker = NiftiLabelsMasker(sch.maps, resampling_target='data')
-ts = {r: masker.fit_transform(clean[r])[clean[r]._keep] for r in R}
+lab_img = image.resample_to_img(sch.maps, mni, interpolation='nearest'); L = bm.transform(lab_img)[0].astype(int)
+def parcel(X): return np.stack([X[:, L == k + 1].mean(1) for k in range(len(labels))], 1)
+masker = NiftiLabelsMasker(lab_img).fit()
+full = {r: parcel(clean[r]) for r in R}
+ts = {r: full[r][keep[r]] for r in R}
 mats = {r: np.corrcoef(ts[r].T) for r in R}
 C = np.tanh(np.mean([np.arctanh(np.clip(mats[r], -.999, .999)) for r in R], 0)); np.fill_diagonal(C, 0)
 np.save(d + 'connectome.npy', C)
@@ -83,15 +79,13 @@ rel = np.array([[np.corrcoef(mats[a][iu], mats[b][iu])[0, 1] for b in R] for a i
 seeds = {'Default mode (posterior cingulate)': (0, -52, 26), 'Motor (left hand area)': (-38, -22, 56),
          'Visual (primary)': (0, -88, 6), 'Salience (anterior insula)': (38, 22, -4),
          'Amygdala (left)': (-22, -4, -18)}
-from nilearn.maskers import NiftiSpheresMasker
-bm = NiftiMasker(mask_img=brain_mask)
-vox = {r: bm.fit_transform(clean[r])[clean[r]._keep] for r in R}
+coords = np.array(np.nonzero(M)).T; world = coords @ mni.affine[:3, :3].T + mni.affine[:3, 3]
 for name, xyz in seeds.items():
+    sel = np.linalg.norm(world - np.array(xyz), axis=1) <= 6
     zs = []
     for r in R:
-        s = NiftiSpheresMasker([xyz], radius=6).fit_transform(clean[r])[clean[r]._keep]
-        s = (s - s.mean()) / s.std(); v = vox[r]
-        rr = (v * s).mean(0) / (v.std(0) + 1e-9); zs.append(np.arctanh(np.clip(rr, -.999, .999)))
+        v = clean[r][keep[r]]; s_ = v[:, sel].mean(1); s_ = (s_ - s_.mean()) / s_.std()
+        rr = (v * s_[:, None]).mean(0) / (v.std(0) + 1e-9); zs.append(np.arctanh(np.clip(rr, -.999, .999)))
     zimg = bm.inverse_transform(np.mean(zs, 0))
     fn = name.split(' ')[0].lower()
     nib.save(zimg, d + f'seed_{fn}.nii.gz')
@@ -102,7 +96,6 @@ for name, xyz in seeds.items():
 
 # ---------- cross-run synchrony (is something time-locked across runs 2-5?) ----------
 n = min(ts[r].shape[0] for r in [2, 3, 4, 5])
-full = {r: masker.transform(clean[r]) for r in [2, 3, 4, 5]}
 n = min(v.shape[0] for v in full.values())
 sync = np.zeros(len(labels))
 pairs = [(a, b) for a in [2, 3, 4, 5] for b in [2, 3, 4, 5] if a < b]
@@ -129,13 +122,15 @@ ax.set_title(f'{labels[k]}: time course in each run'); ax.set_xlabel('minutes');
 plt.tight_layout(); plt.savefig(F + 'sync_timecourse.png', dpi=110); plt.close()
 
 # ---------- ICA ----------
-ica = CanICA(n_components=20, mask=brain_mask, random_state=0, smoothing_fwhm=None, standardize=True, n_init=3)
-ica.fit([clean[r] for r in R])
-comps = ica.components_img_; nib.save(comps, d + 'ica20.nii.gz')
+from sklearn.decomposition import PCA, FastICA
+red = [PCA(60, random_state=0).fit(clean[r][keep[r]]).components_ * 1 for r in R]
+G = PCA(20, random_state=0).fit(np.vstack(red)).components_
+S = FastICA(20, random_state=0, max_iter=2000, whiten='unit-variance').fit_transform(G.T).T  # spatial ICA
+comps = bm.inverse_transform(S); nib.save(comps, d + 'ica20.nii.gz')
 yeo = datasets.fetch_atlas_yeo_2011()
 yeo7 = image.resample_to_img(yeo['thick_7'] if 'thick_7' in yeo else yeo.maps, mni, interpolation='nearest')
 yn = ['Visual', 'Somatomotor', 'Dorsal attention', 'Salience/ventral attn', 'Limbic', 'Frontoparietal control', 'Default mode']
-Y = masking.apply_mask(yeo7, brain_mask).astype(int); Cm = masking.apply_mask(comps, brain_mask)
+Y = masking.apply_mask(yeo7, brain_mask).astype(int); Cm = S
 match = []
 for i in range(Cm.shape[0]):
     c = Cm[i] * np.sign(Cm[i][np.argmax(np.abs(Cm[i]))]); top = c > np.percentile(c, 95)
