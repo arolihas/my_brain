@@ -40,14 +40,14 @@ for r in R:
     eye = ((np.linalg.norm(xyz - [33, 52, -36], axis=1) < 9) | (np.linalg.norm(xyz - [-33, 52, -36], axis=1) < 9)).reshape(vol.shape[:3])
     np.save(d + f'eyes_run{r}.npy', vol[eye][:, 5:].T); np.save(d + f'meanvol_run{r}.npy', vol.mean(-1))
     del vol
-    tsnr = raw.mean(0) / (raw.std(0) + 1e-6); del raw
+    tsnr = raw.mean(0) / (raw.std(0) + 1e-6); gsig = raw.mean(1); del raw
     tsnr_maps.append(tsnr); res[f'run{r}']['median_tSNR_gm'] = round(float(np.median(tsnr)), 1)
     p = np.loadtxt(d + f'run{r}_motion.txt'); dp = np.vstack([np.zeros(6), np.diff(p, axis=0)])
     mot = np.hstack([p, dp, p ** 2, dp ** 2])[5:]
     wz = signal.clean(Wd, detrend=True, standardize='zscore_sample'); u = np.linalg.svd(wz, full_matrices=False)[0][:, :5]
     clean[r] = signal.clean(X, confounds=np.hstack([mot, u]), detrend=True, standardize='zscore_sample', high_pass=0.008, t_r=TR).astype(np.float32)
     keep[r] = fd[r][5:] <= 0.5; res[f'run{r}']['vols_kept_after_scrub'] = int(keep[r].sum())
-    np.save(d + f'clean_run{r}.npy', clean[r]); np.save(d + f'gs_run{r}.npy', raw.mean(1))
+    np.save(d + f'clean_run{r}.npy', clean[r]); np.save(d + f'gs_run{r}.npy', gsig)
     del X, Wd; print('cleaned run', r, flush=True)
 plotting.plot_img(bm.inverse_transform(np.mean(tsnr_maps, 0)), cmap='inferno', colorbar=True, display_mode='z', cut_coords=8,
                   title='temporal SNR (mean over runs)', vmin=0, vmax=80, black_bg=True).savefig(F + 'tsnr.png', dpi=110)
