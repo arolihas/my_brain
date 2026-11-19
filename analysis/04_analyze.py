@@ -56,7 +56,7 @@ sch = datasets.fetch_atlas_schaefer_2018(n_rois=100, yeo_networks=7, resolution_
 labels = [l.decode() if isinstance(l, bytes) else l for l in sch.labels]
 labels = [l for l in labels if l != 'Background']
 net = [l.split('_')[2] for l in labels]
-lab_img = image.resample_to_img(sch.maps, mni, interpolation='nearest'); L = bm.transform(lab_img)[0].astype(int)
+lab_img = image.resample_to_img(sch.maps, mni, interpolation='nearest'); L = masking.apply_mask(lab_img, brain_mask).astype(int)
 def parcel(X): return np.stack([X[:, L == k + 1].mean(1) for k in range(len(labels))], 1)
 masker = NiftiLabelsMasker(lab_img).fit()
 full = {r: parcel(clean[r]) for r in R}

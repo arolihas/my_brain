@@ -1,7 +1,7 @@
 """When did I fall asleep? Sliding-window wakefulness markers per run."""
 import numpy as np, nibabel as nib, json
 import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
-from nilearn import datasets, image, signal
+from nilearn import datasets, image, signal, masking
 from nilearn.maskers import NiftiMasker
 d = 'derivatives/'; F = 'figs/'; TR = 1.155; R = [1, 2, 3, 4, 5]
 mni = datasets.load_mni152_template(resolution=2)
@@ -10,9 +10,9 @@ brain_mask = image.math_img('a * b', a=image.math_img('img > 0', img=nib.load(d 
 bm = NiftiMasker(mask_img=brain_mask).fit()
 sch = datasets.fetch_atlas_schaefer_2018(n_rois=100, yeo_networks=7, resolution_mm=2)
 labels = [l.decode() if isinstance(l, bytes) else l for l in sch.labels if (l.decode() if isinstance(l, bytes) else l) != 'Background']
-L = bm.transform(image.resample_to_img(sch.maps, mni, interpolation='nearest'))[0].astype(int)
+L = masking.apply_mask(image.resample_to_img(sch.maps, mni, interpolation='nearest'), brain_mask).astype(int)
 ho = datasets.fetch_atlas_harvard_oxford('sub-maxprob-thr25-2mm')
-H = bm.transform(image.resample_to_img(ho.maps, mni, interpolation='nearest'))[0].astype(int)
+H = masking.apply_mask(image.resample_to_img(ho.maps, mni, interpolation='nearest'), brain_mask).astype(int)
 thal = np.isin(H, [i for i, n in enumerate(ho.labels) if 'Thalamus' in n])
 vis = np.isin(L, [k + 1 for k, l in enumerate(labels) if '_Vis_' in l])
 cortex = L > 0
@@ -50,8 +50,8 @@ for ax, r in zip(axes, R):
     ax.set_title(f'run {r}'); ax.legend(fontsize=7, ncol=4, loc='upper left')
 plt.close()
 # drowsiness index: high GS amplitude, low eye activity, low visual following, low thalamocortical coupling (each z-scored across all windows of all runs)
-keys = ['global signal amplitude (%)', 'eye-region activity', 'thalamus-cortex coupling (r)', 'visual follows the pictures (r)']
-sign = {keys[0]: 1, keys[1]: -1, keys[2]: -1, keys[3]: -1}
+keys = ['global signal amplitude (%)', 'eye-region activity', 'thalamus-cortex coupling (r)']  # visual-follows dropped: runs use different picture orders
+sign = {keys[0]: 1, keys[1]: -1, keys[2]: -1}
 allv = {k: np.concatenate([summary[r][k] for r in R if k in summary[r]]) for k in keys}
 mu = {k: np.nanmean(v) for k, v in allv.items()}; sd = {k: np.nanstd(v) for k, v in allv.items()}
 fig, axes = plt.subplots(len(R), 1, figsize=(12, 2.4 * len(R)), sharex=True, sharey=True)

@@ -1,0 +1,48 @@
+{
+ "visual_loo_r": {
+  "2": 0.086,
+  "3": 0.045,
+  "4": 0.002,
+  "5": 0.033
+ },
+ "run1": {
+  "mean_index": -0.19,
+  "pct_windows_drowsy(index>0.5)": 13.3,
+  "peak_at_min": 0.7,
+  "global signal amplitude (%)": 0.317,
+  "eye-region activity": 0.76,
+  "thalamus-cortex coupling (r)": 0.002
+ },
+ "run2": {
+  "mean_index": -0.39,
+  "pct_windows_drowsy(index>0.5)": 10.5,
+  "peak_at_min": 10.8,
+  "global signal amplitude (%)": 0.301,
+  "eye-region activity": 0.842,
+  "thalamus-cortex coupling (r)": -0.037
+ },
+ "run3": {
+  "mean_index": 0.99,
+  "pct_windows_drowsy(index>0.5)": 85.7,
+  "peak_at_min": 5.8,
+  "global signal amplitude (%)": 0.494,
+  "eye-region activity": 0.608,
+  "thalamus-cortex coupling (r)": -0.148
+ },
+ "run4": {
+  "mean_index": -0.16,
+  "pct_windows_drowsy(index>0.5)": 3.8,
+  "peak_at_min": 9.5,
+  "global signal amplitude (%)": 0.263,
+  "eye-region activity": 0.764,
+  "thalamus-cortex coupling (r)": -0.096
+ },
+ "run5": {
+  "mean_index": -0.36,
+  "pct_windows_drowsy(index>0.5)": 0.0,
+  "peak_at_min": 2.1,
+  "global signal amplitude (%)": 0.273,
+  "eye-region activity": 0.874,
+  "thalamus-cortex coupling (r)": -0.135
+ }
+}
