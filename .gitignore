@@ -1,3 +1,4 @@
 analysis/derivatives/
 analysis/derivatives_log_*.txt
 __pycache__/
+analysis/run04.log

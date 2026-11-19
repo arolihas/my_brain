@@ -32,12 +32,14 @@ sig = 6 / 2.3548 / 2  # 6mm FWHM in 2mm voxels
 clean = {}; keep = {}; tsnr_maps = []
 for r in R:
     img = nib.load(d + f'run{r}_mni.nii.gz'); T = img.shape[-1]
-    X = np.empty((T - 5, M.sum()), np.float32); Wd = np.empty((T - 5, W.sum()), np.float32)
-    for t in range(5, T):
-        v = np.asarray(img.dataobj[..., t], dtype=np.float32)
-        Wd[t - 5] = v[W]; X[t - 5] = gaussian_filter(v, sig)[M]
-    raw = np.empty((T - 5, M.sum()), np.float32)
-    for t in range(5, T): raw[t - 5] = np.asarray(img.dataobj[..., t], dtype=np.float32)[M]
+    X = np.empty((T - 5, M.sum()), np.float32); 
+    vol = img.get_fdata(dtype=np.float32)
+    raw = vol[M][:, 5:].T.copy(); Wd = vol[W][:, 5:].T.copy()
+    for t in range(5, T): X[t - 5] = gaussian_filter(vol[..., t], sig)[M]
+    ijk = np.indices(vol.shape[:3]).reshape(3, -1).T; xyz = ijk @ mni.affine[:3, :3].T + mni.affine[:3, 3]
+    eye = ((np.linalg.norm(xyz - [33, 52, -36], axis=1) < 9) | (np.linalg.norm(xyz - [-33, 52, -36], axis=1) < 9)).reshape(vol.shape[:3])
+    np.save(d + f'eyes_run{r}.npy', vol[eye][:, 5:].T); np.save(d + f'meanvol_run{r}.npy', vol.mean(-1))
+    del vol
     tsnr = raw.mean(0) / (raw.std(0) + 1e-6); del raw
     tsnr_maps.append(tsnr); res[f'run{r}']['median_tSNR_gm'] = round(float(np.median(tsnr)), 1)
     p = np.loadtxt(d + f'run{r}_motion.txt'); dp = np.vstack([np.zeros(6), np.diff(p, axis=0)])
@@ -45,6 +47,7 @@ for r in R:
     wz = signal.clean(Wd, detrend=True, standardize='zscore_sample'); u = np.linalg.svd(wz, full_matrices=False)[0][:, :5]
     clean[r] = signal.clean(X, confounds=np.hstack([mot, u]), detrend=True, standardize='zscore_sample', high_pass=0.008, t_r=TR).astype(np.float32)
     keep[r] = fd[r][5:] <= 0.5; res[f'run{r}']['vols_kept_after_scrub'] = int(keep[r].sum())
+    np.save(d + f'clean_run{r}.npy', clean[r]); np.save(d + f'gs_run{r}.npy', raw.mean(1))
     del X, Wd; print('cleaned run', r, flush=True)
 plotting.plot_img(bm.inverse_transform(np.mean(tsnr_maps, 0)), cmap='inferno', colorbar=True, display_mode='z', cut_coords=8,
                   title='temporal SNR (mean over runs)', vmin=0, vmax=80, black_bg=True).savefig(F + 'tsnr.png', dpi=110)
