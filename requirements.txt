@@ -1,0 +1,12 @@
+# Python 3.10+. Versions are the ones the pipeline was last run with.
+nibabel>=5.2
+nilearn>=0.11
+dipy>=1.9
+numpy>=1.26
+scipy>=1.11
+scikit-learn>=1.4
+scikit-image>=0.22
+matplotlib>=3.8
+pydicom>=2.4          # reading DICOM headers
+dcm2niix              # step 00 (DICOM -> NIfTI); only needed if nifti/ is missing
+jupyter               # for viz_playground.ipynb
