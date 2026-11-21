@@ -30,7 +30,14 @@ wm_mask = image.math_img('img > 0.9', img=image.resample_to_img(datasets.load_mn
 M = brain_mask.get_fdata() > 0; W = wm_mask.get_fdata() > 0
 sig = 6 / 2.3548 / 2  # 6mm FWHM in 2mm voxels
 clean = {}; keep = {}; tsnr_maps = []
-for r in R:
+import os
+cached = all(os.path.exists(d + f'clean_run{r}.npy') for r in R)
+if cached:
+    for r in R:
+        clean[r] = np.load(d + f'clean_run{r}.npy'); keep[r] = fd[r][5:] <= 0.5
+        res[f'run{r}']['vols_kept_after_scrub'] = int(keep[r].sum())
+    print('using cached cleaned data', flush=True)
+for r in ([] if cached else R):
     img = nib.load(d + f'run{r}_mni.nii.gz'); T = img.shape[-1]
     X = np.empty((T - 5, M.sum()), np.float32); 
     vol = img.get_fdata(dtype=np.float32)
@@ -49,7 +56,7 @@ for r in R:
     keep[r] = fd[r][5:] <= 0.5; res[f'run{r}']['vols_kept_after_scrub'] = int(keep[r].sum())
     np.save(d + f'clean_run{r}.npy', clean[r]); np.save(d + f'gs_run{r}.npy', gsig)
     del X, Wd; print('cleaned run', r, flush=True)
-plotting.plot_img(bm.inverse_transform(np.mean(tsnr_maps, 0)), cmap='inferno', colorbar=True, display_mode='z', cut_coords=8,
+if tsnr_maps: plotting.plot_img(bm.inverse_transform(np.mean(tsnr_maps, 0)), cmap='inferno', colorbar=True, display_mode='z', cut_coords=8,
                   title='temporal SNR (mean over runs)', vmin=0, vmax=80, black_bg=True).savefig(F + 'tsnr.png', dpi=110)
 # ---------- atlas connectivity ----------
 sch = datasets.fetch_atlas_schaefer_2018(n_rois=100, yeo_networks=7, resolution_mm=2)
@@ -130,10 +137,9 @@ red = [PCA(60, random_state=0).fit(clean[r][keep[r]]).components_ * 1 for r in R
 G = PCA(20, random_state=0).fit(np.vstack(red)).components_
 S = FastICA(20, random_state=0, max_iter=2000, whiten='unit-variance').fit_transform(G.T).T  # spatial ICA
 comps = bm.inverse_transform(S); nib.save(comps, d + 'ica20.nii.gz')
-yeo = datasets.fetch_atlas_yeo_2011()
-yeo7 = image.resample_to_img(yeo['thick_7'] if 'thick_7' in yeo else yeo.maps, mni, interpolation='nearest')
 yn = ['Visual', 'Somatomotor', 'Dorsal attention', 'Salience/ventral attn', 'Limbic', 'Frontoparietal control', 'Default mode']
-Y = masking.apply_mask(yeo7, brain_mask).astype(int); Cm = S
+codes = ['Vis', 'SomMot', 'DorsAttn', 'SalVentAttn', 'Limbic', 'Cont', 'Default']  # Schaefer parcels carry Yeo-7 labels
+parcel_net = np.array([0] + [codes.index(n) + 1 for n in net]); Y = parcel_net[L]; Cm = S
 match = []
 for i in range(Cm.shape[0]):
     c = Cm[i] * np.sign(Cm[i][np.argmax(np.abs(Cm[i]))]); top = c > np.percentile(c, 95)

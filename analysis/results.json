@@ -1,0 +1,235 @@
+{
+ "run1": {
+  "n_vols": 296,
+  "minutes": 5.7,
+  "mean_FD": 0.092,
+  "pct_FD_over_0p5": 1.4,
+  "max_disp_mm": 0.55,
+  "vols_kept_after_scrub": 287
+ },
+ "run2": {
+  "n_vols": 586,
+  "minutes": 11.3,
+  "mean_FD": 0.109,
+  "pct_FD_over_0p5": 0.9,
+  "max_disp_mm": 1.69,
+  "vols_kept_after_scrub": 576
+ },
+ "run3": {
+  "n_vols": 586,
+  "minutes": 11.3,
+  "mean_FD": 0.192,
+  "pct_FD_over_0p5": 6.1,
+  "max_disp_mm": 1.7,
+  "vols_kept_after_scrub": 545
+ },
+ "run4": {
+  "n_vols": 586,
+  "minutes": 11.3,
+  "mean_FD": 0.064,
+  "pct_FD_over_0p5": 1.5,
+  "max_disp_mm": 0.67,
+  "vols_kept_after_scrub": 572
+ },
+ "run5": {
+  "n_vols": 586,
+  "minutes": 11.3,
+  "mean_FD": 0.09,
+  "pct_FD_over_0p5": 0.7,
+  "max_disp_mm": 0.74,
+  "vols_kept_after_scrub": 577
+ },
+ "network_within_r": {
+  "Vis": 0.333,
+  "SomMot": 0.295,
+  "DorsAttn": 0.195,
+  "SalVentAttn": 0.122,
+  "Limbic": 0.356,
+  "Cont": 0.26,
+  "Default": 0.143
+ },
+ "network_between_r": -0.005,
+ "connectome_run_similarity": [
+  [
+   1.0,
+   0.59,
+   0.63,
+   0.69,
+   0.63
+  ],
+  [
+   0.59,
+   1.0,
+   0.71,
+   0.77,
+   0.76
+  ],
+  [
+   0.63,
+   0.71,
+   1.0,
+   0.75,
+   0.73
+  ],
+  [
+   0.69,
+   0.77,
+   0.75,
+   1.0,
+   0.81
+  ],
+  [
+   0.63,
+   0.76,
+   0.73,
+   0.81,
+   1.0
+  ]
+ ],
+ "cross_run_sync_top": [
+  [
+   "7Networks_LH_Cont_Par_1",
+   0.069
+  ],
+  [
+   "7Networks_LH_Cont_PFCl_1",
+   0.061
+  ],
+  [
+   "7Networks_LH_Default_PFC_7",
+   0.046
+  ],
+  [
+   "7Networks_LH_Vis_5",
+   0.046
+  ],
+  [
+   "7Networks_RH_Default_PFCv_2",
+   0.045
+  ],
+  [
+   "7Networks_RH_DorsAttn_Post_1",
+   0.04
+  ],
+  [
+   "7Networks_LH_SalVentAttn_PFCl_1",
+   0.038
+  ],
+  [
+   "7Networks_LH_Default_PFC_3",
+   0.037
+  ],
+  [
+   "7Networks_LH_DorsAttn_FEF_1",
+   0.033
+  ],
+  [
+   "7Networks_RH_SalVentAttn_FrOperIns_1",
+   0.033
+  ]
+ ],
+ "cross_run_sync_median": -0.005,
+ "cross_run_sync_null_95pct": 0.132,
+ "ica_matches": [
+  [
+   0,
+   "Visual",
+   0.23
+  ],
+  [
+   1,
+   "Default mode",
+   0.24
+  ],
+  [
+   2,
+   "Default mode",
+   0.22
+  ],
+  [
+   3,
+   "Default mode",
+   0.27
+  ],
+  [
+   4,
+   "Visual",
+   0.31
+  ],
+  [
+   5,
+   "Default mode",
+   0.31
+  ],
+  [
+   6,
+   "Limbic",
+   0.16
+  ],
+  [
+   7,
+   "Default mode",
+   0.32
+  ],
+  [
+   8,
+   "Somatomotor",
+   0.3
+  ],
+  [
+   9,
+   "Visual",
+   0.71
+  ],
+  [
+   10,
+   "Default mode",
+   0.27
+  ],
+  [
+   11,
+   "Somatomotor",
+   0.3
+  ],
+  [
+   12,
+   "Somatomotor",
+   0.35
+  ],
+  [
+   13,
+   "Somatomotor",
+   0.32
+  ],
+  [
+   14,
+   "Default mode",
+   0.49
+  ],
+  [
+   15,
+   "Default mode",
+   0.29
+  ],
+  [
+   16,
+   "Default mode",
+   0.32
+  ],
+  [
+   17,
+   "Default mode",
+   0.33
+  ],
+  [
+   18,
+   "Somatomotor",
+   0.35
+  ],
+  [
+   19,
+   "Default mode",
+   0.28
+  ]
+ ]
+}
