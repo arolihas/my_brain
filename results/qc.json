@@ -1,0 +1,52 @@
+{
+ "run1": {
+  "volumes": 296,
+  "minutes": 5.7,
+  "mean_FD_mm": 0.092,
+  "pct_volumes_FD_over_0p5": 1.4,
+  "max_displacement_mm": 0.55,
+  "max_rotation_deg": 0.36,
+  "volumes_kept": 287,
+  "median_tSNR": 139.8
+ },
+ "run2": {
+  "volumes": 586,
+  "minutes": 11.3,
+  "mean_FD_mm": 0.109,
+  "pct_volumes_FD_over_0p5": 0.9,
+  "max_displacement_mm": 1.69,
+  "max_rotation_deg": 1.37,
+  "volumes_kept": 576,
+  "median_tSNR": 100.8
+ },
+ "run3": {
+  "volumes": 586,
+  "minutes": 11.3,
+  "mean_FD_mm": 0.192,
+  "pct_volumes_FD_over_0p5": 6.1,
+  "max_displacement_mm": 1.7,
+  "max_rotation_deg": 1.45,
+  "volumes_kept": 545,
+  "median_tSNR": 85.1
+ },
+ "run4": {
+  "volumes": 586,
+  "minutes": 11.3,
+  "mean_FD_mm": 0.064,
+  "pct_volumes_FD_over_0p5": 1.5,
+  "max_displacement_mm": 0.67,
+  "max_rotation_deg": 1.78,
+  "volumes_kept": 572,
+  "median_tSNR": 120.7
+ },
+ "run5": {
+  "volumes": 586,
+  "minutes": 11.3,
+  "mean_FD_mm": 0.09,
+  "pct_volumes_FD_over_0p5": 0.7,
+  "max_displacement_mm": 0.74,
+  "max_rotation_deg": 0.47,
+  "volumes_kept": 577,
+  "median_tSNR": 139.6
+ }
+}
