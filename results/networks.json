@@ -1,0 +1,177 @@
+{
+ "within_network_r": {
+  "Vis": 0.328,
+  "SomMot": 0.322,
+  "DorsAttn": 0.218,
+  "SalVentAttn": 0.191,
+  "Limbic": 0.435,
+  "Cont": 0.316,
+  "Default": 0.177
+ },
+ "between_network_r": 0.0,
+ "run_to_run_connectome_similarity": [
+  [
+   1.0,
+   0.62,
+   0.65,
+   0.69,
+   0.66
+  ],
+  [
+   0.62,
+   1.0,
+   0.71,
+   0.78,
+   0.76
+  ],
+  [
+   0.65,
+   0.71,
+   1.0,
+   0.76,
+   0.74
+  ],
+  [
+   0.69,
+   0.78,
+   0.76,
+   1.0,
+   0.84
+  ],
+  [
+   0.66,
+   0.76,
+   0.74,
+   0.84,
+   1.0
+  ]
+ ],
+ "cross_run_sync": {
+  "top_regions": [
+   [
+    "7Networks_LH_Vis_5",
+    0.064
+   ],
+   [
+    "7Networks_LH_DorsAttn_Post_3",
+    0.055
+   ],
+   [
+    "7Networks_RH_Cont_pCun_1",
+    0.049
+   ],
+   [
+    "7Networks_LH_DorsAttn_Post_5",
+    0.048
+   ],
+   [
+    "7Networks_RH_Vis_4",
+    0.045
+   ]
+  ],
+  "median": -0.002,
+  "chance_95pct": 0.1
+ },
+ "ica_components": [
+  {
+   "component": 0,
+   "closest_network": "Default mode",
+   "overlap": 0.26
+  },
+  {
+   "component": 1,
+   "closest_network": "Default mode",
+   "overlap": 0.29
+  },
+  {
+   "component": 2,
+   "closest_network": "Visual",
+   "overlap": 0.33
+  },
+  {
+   "component": 3,
+   "closest_network": "Somatomotor",
+   "overlap": 0.36
+  },
+  {
+   "component": 4,
+   "closest_network": "Dorsal attention",
+   "overlap": 0.43
+  },
+  {
+   "component": 5,
+   "closest_network": "Visual",
+   "overlap": 0.72
+  },
+  {
+   "component": 6,
+   "closest_network": "Default mode",
+   "overlap": 0.3
+  },
+  {
+   "component": 7,
+   "closest_network": "Somatomotor",
+   "overlap": 0.59
+  },
+  {
+   "component": 8,
+   "closest_network": "Default mode",
+   "overlap": 0.5
+  },
+  {
+   "component": 9,
+   "closest_network": "Visual",
+   "overlap": 0.77
+  },
+  {
+   "component": 10,
+   "closest_network": "Limbic",
+   "overlap": 0.34
+  },
+  {
+   "component": 11,
+   "closest_network": "Default mode",
+   "overlap": 0.31
+  },
+  {
+   "component": 12,
+   "closest_network": "Default mode",
+   "overlap": 0.25
+  },
+  {
+   "component": 13,
+   "closest_network": "Default mode",
+   "overlap": 0.0
+  },
+  {
+   "component": 14,
+   "closest_network": "Default mode",
+   "overlap": 0.17
+  },
+  {
+   "component": 15,
+   "closest_network": "Frontoparietal control",
+   "overlap": 0.3
+  },
+  {
+   "component": 16,
+   "closest_network": "Frontoparietal control",
+   "overlap": 0.31
+  },
+  {
+   "component": 17,
+   "closest_network": "Frontoparietal control",
+   "overlap": 0.45
+  },
+  {
+   "component": 18,
+   "closest_network": "Frontoparietal control",
+   "overlap": 0.17
+  },
+  {
+   "component": 19,
+   "closest_network": "Somatomotor",
+   "overlap": 0.38
+  }
+ ]
+}
