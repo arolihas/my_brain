@@ -13,7 +13,8 @@ did I fall asleep in the scanner.
 | **Data quality** | Very low head motion (mean framewise displacement 0.06–0.19 mm per run). Run 3 was the worst: 6% of volumes were scrubbed. See `figures/qc_motion.png`. |
 | **The nap** | Probably **run 3, about 1:58–2:06 pm**. Whole-brain signal swings are 60–80% bigger than in any other run, the eye region goes quiet, and thalamus–cortex coupling drops. Signs of drowsiness start near the end of run 2, and runs 4–5 look awake. See `figures/drowsiness.png`. |
 | **Networks** | A textbook default mode network (posterior cingulate + medial prefrontal + angular gyri), clean visual and somatomotor networks, and a connectome that works like a fingerprint (runs 4 and 5 match at r = 0.84). See `figures/seed_default.png`, `figures/connectome.png` and `figures/ica_networks.png`. |
-| **The task** | The pictures were shown in a different order each run: no region follows a shared timeline (best r = 0.06 against a chance level of 0.10). Mapping my response to the emotional pictures needs the study's stimulus timing files. |
+| **The study** | Almost certainly [James & Duarte, *Neurobiology of Aging* 2023](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11212072/). The task: a sound announced each picture's valence (slot machine = positive, whistle = neutral, screeching tyres = negative), then I rated the picture's intensity from 1 to 4. On 25% of trials, no picture came. There were 252 IAPS/NAPS pictures, and a memory test afterwards. No timing files or data are public (I checked Zenodo, OSF and OpenNeuro). |
+| **The task timing** | Picture order was randomised per run, so runs share no timeline (best r = 0.06 against a chance level of 0.10). But the sounds leave a trace: auditory cortex has a strong 8–10 s trial rhythm that control regions lack. Deconvolving it recovers 61–70 of the ~84 trials per run. Visual cortex mirrors it, peaking about 6 s after each recovered cue, so I was alternating between hearing a cue and looking at a picture. The recovered onsets are approximate and incomplete: they miss about 20% of trials and can't tell positive from negative or catch trials. See `figures/trial_onsets.png` and `results/trial_onsets/`. |
 | **Distortion** | The field maps predict up to about 5 mm of distortion in orbitofrontal cortex and the temporal poles. My own correction didn't measurably improve the fit at this resolution, so the data are left uncorrected (`results/fieldmap_check.json`). Treat orbitofrontal and amygdala results as ±a few mm. |
 
 Numbers are in `results/*.json`. Interactive 3D viewers (open in a browser) are in `figures/interactive/`.
@@ -60,6 +61,7 @@ whose outputs exist; `--from N` forces step N onwards, `--only N` forces one ste
 | `06_networks` | connectome (Schaefer 100), seed maps, ICA, cross-run timeline test |
 | `07_drowsiness` | sliding-window sleepiness markers per run |
 | `08_interactive` | browser-viewable 3D maps (replaces the old `3d_brain.html` / `4d_brain.html`) |
+| `09_trial_onsets` | recovers approximate trial onsets from auditory cortex, and checks them against other regions |
 | `x1_fieldmap_check` | optional (`--fieldmap`): field-map distortion correction and the test that rejected it |
 
 Everything runs in plain Python (nilearn, dipy, scikit-learn), with no FSL, AFNI or FreeSurfer.

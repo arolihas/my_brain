@@ -11,7 +11,7 @@ Steps 1 and 3 are slow (~20 and ~10 minutes with 4 cores); the rest take a few m
 import argparse, importlib, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-STEPS = ['00_convert', '01_motion', '02_register', '03_to_mni', '04_denoise', '05_qc', '06_networks', '07_drowsiness', '08_interactive']
+STEPS = ['00_convert', '01_motion', '02_register', '03_to_mni', '04_denoise', '05_qc', '06_networks', '07_drowsiness', '08_interactive', '09_trial_onsets']
 OPTIONAL = ['x1_fieldmap_check']
 
 

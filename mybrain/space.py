@@ -71,6 +71,18 @@ def thalamus():
     return np.isin(lab, [i for i, n in enumerate(ho.labels) if 'Thalamus' in n])
 
 
+@lru_cache
+def _ho_cortical():
+    ho = datasets.fetch_atlas_harvard_oxford('cort-maxprob-thr25-2mm', verbose=0)
+    return ho.labels, masking.apply_mask(_to_mni(ho.maps), brain_mask()).astype(int)
+
+
+def cortical_region(*name_parts):
+    """Analysis voxels in Harvard-Oxford cortical regions whose names contain any of name_parts."""
+    labels, per_voxel = _ho_cortical()
+    return np.isin(per_voxel, [i for i, n in enumerate(labels) if any(k in n for k in name_parts)])
+
+
 def parcellate(X, per_voxel, n):
     """Mean time series in each parcel 1..n of an (time x voxel) array."""
     return np.stack([X[:, per_voxel == k + 1].mean(1) for k in range(n)], 1)

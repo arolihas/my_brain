@@ -1,0 +1,118 @@
+{
+ "events_per_run": {
+  "2": 61,
+  "3": 70,
+  "4": 64,
+  "5": 63
+ },
+ "expected_per_run": 84,
+ "event_locked": {
+  "auditory": {
+   "peak_s": 5.8,
+   "trough_s": 2.3,
+   "pct_outside_chance": 73
+  },
+  "visual": {
+   "peak_s": 2.3,
+   "trough_s": 6.9,
+   "pct_outside_chance": 45
+  },
+  "motor": {
+   "peak_s": 1.2,
+   "trough_s": -3.5,
+   "pct_outside_chance": 9
+  },
+  "default": {
+   "peak_s": 5.8,
+   "trough_s": 1.2,
+   "pct_outside_chance": 36
+  },
+  "frontal": {
+   "peak_s": 18.5,
+   "trough_s": 5.8,
+   "pct_outside_chance": 23
+  }
+ },
+ "cross_correlation": {
+  "auditory->visual": {
+   "peak_lag_s_per_run": [
+    5.8,
+    5.8,
+    6.9,
+    -4.6
+   ],
+   "peak_r_per_run": [
+    0.154,
+    0.192,
+    0.137,
+    0.169
+   ],
+   "r_at_zero_lag_per_run": [
+    -0.219,
+    -0.474,
+    -0.379,
+    -0.476
+   ]
+  },
+  "visual->motor": {
+   "peak_lag_s_per_run": [
+    1.2,
+    1.2,
+    0.0,
+    -9.2
+   ],
+   "peak_r_per_run": [
+    0.153,
+    0.153,
+    0.177,
+    0.082
+   ],
+   "r_at_zero_lag_per_run": [
+    0.144,
+    0.096,
+    0.177,
+    -0.101
+   ]
+  },
+  "auditory->default": {
+   "peak_lag_s_per_run": [
+    0.0,
+    0.0,
+    1.2,
+    0.0
+   ],
+   "peak_r_per_run": [
+    0.208,
+    0.379,
+    0.212,
+    0.2
+   ],
+   "r_at_zero_lag_per_run": [
+    0.208,
+    0.379,
+    0.181,
+    0.2
+   ]
+  },
+  "auditory->frontal": {
+   "peak_lag_s_per_run": [
+    -9.2,
+    5.8,
+    9.2,
+    9.2
+   ],
+   "peak_r_per_run": [
+    0.063,
+    0.095,
+    0.107,
+    0.088
+   ],
+   "r_at_zero_lag_per_run": [
+    -0.104,
+    -0.118,
+    -0.066,
+    -0.264
+   ]
+  }
+ }
+}
